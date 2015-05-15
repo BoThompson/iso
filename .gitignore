@@ -1,0 +1,8 @@
+# git ignore file
+Debug/*
+*.open*
+*.dll
+*.png
+*.bmp
+ipch/*
+*.suo

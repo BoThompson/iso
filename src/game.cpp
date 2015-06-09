@@ -4,8 +4,13 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
-#include "game.h"
+#include "texture.h"
+#include "tiles.h"
 #include "utils.h"
+#include "map.h"
+#include "game.h"
+
+using namespace std;
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -64,6 +69,9 @@ int start = 0;
 int current;
 bool nextscreen;
 
+/// <summary>
+/// Initializes a new instance of the <see cref="TextureData"/> class.
+/// </summary>
 TextureData::TextureData()
 {
 	m_texture = NULL;
@@ -71,35 +79,70 @@ TextureData::TextureData()
 	m_height = 0;
 }
 
+/// <summary>
+/// Sets the width.
+/// </summary>
+/// <param name="width">The width.</param>
+/// <returns>returns the new width</returns>
 int TextureData::SetWidth(int width)
 {
 	m_width = width;
 	return m_width;
 }
 
+/// <summary>
+/// Sets the height.
+/// </summary>
+/// <param name="height">The height.</param>
+/// <returns>returns the new height</returns>
 int TextureData::SetHeight(int height)
 {
 	m_height = height;
 	return height;
 }
 
+/// <summary>
+/// Sets initial color using RGB coordinates.
+/// </summary>
+/// <param name="red">The red coordinate.</param>
+/// <param name="green">The green coordinate.</param>
+/// <param name="blue">The blue coordinate.</param>
 void TextureData::SetColor(Uint8 red, Uint8 green, Uint8 blue)
 {
 	SDL_SetTextureColorMod(m_texture, red, green, blue);
 }
 
+/// <summary>
+/// Sets the blending mode mainly for alpha blending.
+/// </summary>
+/// <param name="blending">The blending.</param>
 void TextureData::SetBlendMode(SDL_BlendMode blending)
 {
 	SDL_SetTextureBlendMode(m_texture, blending);
 }
 
 //(int x, int y, SDL_Rect* clip, double angle, SDL_Point * center, SDL_RendererFlip flip);
+/// <summary>
+/// Renders the texture to the specified render.
+/// </summary>
+/// <param name="renderer">The renderer specified.</param>
+/// <param name="src">The source rectangle or what has been clipped. ex. frame of spritesheet.</param>
+/// <param name="dest">The dest rectangle or where it will show up on screen.</param>
 void TextureData::Render (SDL_Renderer * renderer, SDL_Rect *src, SDL_Rect *dest)
 {
 	SDL_RenderCopy(renderer, m_texture, src, dest);
-	// SDL_RenderCopyEx();
 }
 
+/// <summary>
+/// Renders the texture with the ability of rotationa and flipping.
+/// </summary>
+/// <param name="x">Where on the x coordinate it should appear.</param>
+/// <param name="y">Where on the y coordinate it should appear.</param>
+/// <param name="renderer">The renderer specified.</param>
+/// <param name="clip">The clip: cropping the texture.</param>
+/// <param name="angle">The angle: for rotation.</param>
+/// <param name="center">The center of rotation.</param>
+/// <param name="flip">How the texture should flip.</param>
 void TextureData::NRender (int x, int y, SDL_Renderer * renderer, SDL_Rect * clip, double angle, SDL_Point * center, SDL_RendererFlip flip )
 {
 	SDL_Rect renderQuad = {x, y, m_width, m_height};
@@ -113,21 +156,39 @@ void TextureData::NRender (int x, int y, SDL_Renderer * renderer, SDL_Rect * cli
 	SDL_RenderCopyEx(renderer, m_texture, clip, &renderQuad, angle, center, flip);
 }
 
+/// <summary>
+/// Sets the alpha.
+/// </summary>
+/// <param name="alpha">The alpha rate requested.</param>
 void TextureData::SetAlpha(Uint8 alpha)
 {
 	SDL_SetTextureAlphaMod(m_texture, alpha);
 }
 
+/// <summary>
+/// Width of the texture.
+/// </summary>
+/// <returns>returns the width of the texture</returns>
 int TextureData::Width()
 {
 	return m_width;
 }
 
+/// <summary>
+/// Height of the texture.
+/// </summary>
+/// <returns>returns the height of the texture</returns>
 int TextureData::Height()
 {
 	return m_height;
 }
 
+/// <summary>
+/// Tell the game to start the effect.
+/// </summary>
+/// <param name="flag">The flag: which effect to do.</param>
+/// <param name="start">The start: what time to start.</param>
+/// <param name="final">The final: what time to end.</param>
 void TextureData::SetEffect(int flag, long start, long final)
 {
 	if(flag >= MAX_TEXFX)
@@ -141,6 +202,9 @@ void TextureData::SetEffect(int flag, long start, long final)
 	m_texfxStart[flag] = start;
 	m_texfxEnd[flag] = final;
 }
+/// <summary>
+/// Does whatever effect was called in SetEffect.
+/// </summary>
 void TextureData::UpdateEffects()
 {
 	Uint8 a;
@@ -179,159 +243,13 @@ void TextureData::UpdateEffects()
 		}
 	}
 }
-TilesheetData::TilesheetData()
-{
-	m_textureTile = TextureData();
-}
-
-void TilesheetData::LoadTileSheet(std::string path, SDL_Renderer * renderer)
-{
-	//SDL_Texture * texture = LoadTexture(path, renderer);
-	m_textureTile = TextureData();
-	m_textureTile.Setup(LoadTexture(path, renderer));
-	//TextureData nTexture;
-
-	//if(nTexture.Setup(LoadTexture(path, renderer)))
-		//return &nTexture;
-	
-}
-
-TileData::TileData( int tileType)
-{
-	m_tileType = tileType; // will happen in tile drawing function
-	tilenum = -1; 
-}
-
-void TilesheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest)
-{
-	SDL_Rect source;
-	if(num == -1)
-		return;
-	source.x = (num * TILE_WIDTH) % m_textureTile.Width();
-	source.y = (num * TILE_WIDTH) / m_textureTile.Width() * TILE_HEIGHT;
-	source.w = TILE_WIDTH;
-	source.h = TILE_HEIGHT;
-
-	m_textureTile.Render(renderer, &source, &dest);
-}
-
-MapData::MapData()
-{
-	m_tilesheet = TilesheetData();
-}
-
-bool MapData::Setup(std::string file)
-{
-	bool success = true;
-	int x = 0;
-	int y = 0;
-	int tx = 0;
-	int ty = 0;
-
-	std::ifstream mapFile (file.c_str());
-
-	if (mapFile == NULL)
-	{
-		printf("unable to load map file\n");
-		success = false;
-	}
-
-	m_tilesheet.LoadTileSheet("image/tile.png", game.GameRender());
-
-	for (y = 0; y < 16; y++)
-	{
-		for (x = 0; x < 12 ; x++)
-		{
-			int tileType = -1;
-
-			mapFile >> tileType;
-
-			if (mapFile.fail())
-			{
-			   printf( "Error loading map: Unexpected end of file!\n" );
-			   success = false;
-			   break;
-			}
-
-			/*if ((tileType >= 0) && (tileType < TOTAL_TILE_SPRITES))
-			{
-				tilesheet.tileset[i] = new TileData(x, y, tileType);
-			}*/
-			if ((tileType >= 0) && (tileType < TOTAL_TILE_SPRITES))
-			{
-				m_tileSet[x][y] = new TileData(tileType);
-			}
-			else
-			{
-				printf( "Error loading map: Invalid tile type found" );
-				success = false;
-				break;
-			}
-		}
-
-		/*
-		x += TILE_WIDTH;
-
-		if (x >= LEVEL_WIDTH)
-		{
-			x = 0;
-			y += TILE_HEIGHT;
-		}*/
-	}
-	
-	mapFile.close();
-	return success;
-}
-
-void MapData::Render(SDL_Renderer * renderer, int x, int y)
-{
-	SDL_Rect r;
-	r.w = TILE_WIDTH;
-	r.h = TILE_HEIGHT;
-	r.x = x;
-	r.y = y;
-	int rx;
-	for (int y = 0; y < 15; y++) //test
-	{
-		//new
-		//r.y += 16;
-
-		int ty = y;
-		rx = r.x;
-		for (int tx = 0; ty >= 0; tx++)
-		{
-			if (tx > 11) // glitch fix, tries to go in 12th part of tileset when there is none, access mem. violation. // y+= 16, x-= 31
-				break;
-
-			//new
-			//r.x -= 31;
-
-			//r.x -= 31 + (tx*TILE_WIDTH);
-			//r.y += 16 + (ty*TILE_HEIGHT);
-
-			m_tilesheet.Render(renderer, m_tileSet[tx][ty]->tilenum, r);
-			r.x += 64;
-
-			ty--;
-		}
-		r.x = rx - 32;
-		r.y += 16;
-
-		
-	}
-}
-
-/*
-TileData::TileData( int tileType)
-{
-
-	m_tileType = tileType;
-}*/
 
 /// <summary>
-/// Setups this instance.
+/// Sets up the game. Opens libraries needed to run, and files to initially open.
 /// </summary>
-/// <returns> returns false if an error occurs</returns>
+/// <returns>
+/// returns false if an error occurs
+/// </returns>
 bool GameData::Setup()
 {
 	bool success = true;
@@ -446,10 +364,10 @@ bool GameData::Setup()
 		}
 	}
 	return success;
-}//Unhandled exception at 0x000000f0 in iso_project.exe: 0xC0000005: Access violation.
+}//Unhandled exception at 0x000000f0 in iso_project.exe: 0xC0000005: Access violation fixed.
 
 /// <summary>
-/// Polls the user for input.
+/// Event polling: clicking the close button, clicking the mouse or pressing a key is handled here.
 /// </summary>
 void GameData::Poll()
 {
@@ -514,6 +432,9 @@ void GameData::Poll()
 	}
 }
 
+/// <summary>
+/// Updates game, time, etc.
+/// </summary>
 void GameData::Update ()
 {
 	current = SDL_GetTicks();
@@ -525,17 +446,28 @@ void GameData::Update ()
 // 255 * (current - start)/(final - start)
 // all alpha - alpha that should've been lost
 
+/// <summary>
+/// Games the render.
+/// </summary>
+/// <returns>
+/// returns the main renderer
+/// </returns>
 SDL_Renderer * GameData::GameRender()
 {
 	return m_renderer;
 }
 
+/// <summary>
+/// Loads the image.
+/// </summary>
+/// <param name="path">The filename of the image.</param>
+/// <returns>returns the SDL Texture resulting from the load Texture func.</returns>
 SDL_Texture * GameData::LoadImage(std::string path)
 {
 	return LoadTexture(path, m_renderer);
 }
 /// <summary>
-/// Draws to the game.
+/// Draws to the game every frame.
 /// </summary>
 void GameData::Draw()
 {
@@ -632,7 +564,7 @@ void GameData::Draw()
 }
 
 /// <summary>
-/// Shuts down game.
+/// Shuts down game and its depending libraries, then closes window.
 /// </summary>
 void GameData::Shutdown()
 {
@@ -662,7 +594,9 @@ void GameData::Shutdown()
 /// <summary>
 /// Runs the game.
 /// </summary>
-/// <returns></returns>
+/// <returns>
+/// at this point nothing, may be changed to void function
+/// </returns>
 bool GameData::Run()
 {
 	if (!Setup() )

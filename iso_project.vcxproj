@@ -12,11 +12,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\game.h" />
+    <ClInclude Include="include\map.h" />
+    <ClInclude Include="include\texture.h" />
+    <ClInclude Include="include\tiles.h" />
     <ClInclude Include="include\utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\map.cpp" />
+    <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\tiles.cpp" />
     <ClCompile Include="src\utils.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

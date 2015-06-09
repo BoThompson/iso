@@ -30,6 +30,15 @@
     <ClInclude Include="include\game.h">
       <Filter>engine\header files</Filter>
     </ClInclude>
+    <ClInclude Include="include\texture.h">
+      <Filter>engine\header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tiles.h">
+      <Filter>engine\header files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\map.h">
+      <Filter>engine\header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -39,6 +48,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game.cpp">
+      <Filter>engine\source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\map.cpp">
+      <Filter>engine\source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texture.cpp">
+      <Filter>engine\source files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tiles.cpp">
       <Filter>engine\source files</Filter>
     </ClCompile>
   </ItemGroup>

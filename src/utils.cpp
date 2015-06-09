@@ -3,6 +3,7 @@
 #include <string>
 #include "utils.h"
 #include "game.h"
+#include "texture.h"
 
 /// <summary>
 /// Loads the texture.
@@ -35,6 +36,14 @@ SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer )
 	return finalTexture;
 }
 
+/// <summary>
+/// Overloaded function that loads the texture.
+/// </summary>
+/// <param name="text">The text to display.</param>
+/// <param name="font">The font to display the text with.</param>
+/// <param name="color">The color.</param>
+/// <param name="renderer">The specified renderer.</param>
+/// <returns>returns the final version of the texture</returns>
 SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, SDL_Renderer * renderer )
 {
 	SDL_Surface * textSurface = TTF_RenderText_Solid( font, text.c_str(), color);
@@ -57,6 +66,11 @@ SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, 
 	return finalTexture;
 }
 
+/// <summary>
+/// Setups the specified texture from raw texture data.
+/// </summary>
+/// <param name="texture">Raw texture data.</param>
+/// <returns>returns true if done, false if texture given is null or if texture already setup</returns>
 bool TextureData::Setup (SDL_Texture * texture)
 {
 	if (texture == NULL || m_texture != NULL)
@@ -69,6 +83,9 @@ bool TextureData::Setup (SDL_Texture * texture)
 	return true;
 }
 
+/// <summary>
+/// Frees this instance from memory.
+/// </summary>
 void TextureData::Free()
 {
 	if( m_texture != NULL )

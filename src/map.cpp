@@ -1,20 +1,8 @@
-#include <stdio.h>
-#include <string>
-#include <stdlib.h>
-#include <fstream>
-#include <SDL.h>
-#include <SDL_image.h>
-#include "texture.h"
-#include "tiles.h"
-#include "utils.h"
-#include "game.h"
-#include "map.h"
+#include "include.h"
 
 extern GameData game;
+extern SDL_Rect camera;
 extern enum Effects;
-
-const int TILE_WIDTH = 64; //error lnk2001
-const int TILE_HEIGHT = 31;
 
 const int TOTAL_TILE_SPRITES = 12;
 
@@ -24,6 +12,14 @@ const int TOTAL_TILE_SPRITES = 12;
 MapData::MapData()
 {
 	m_tilesheet = TilesheetData();
+	//m_filename = new char[ 1024 ];
+
+	m_height = NULL;
+	m_width = NULL;
+	//m_filename = NULL;
+
+	m_x = 0;
+	m_y = 0;
 }
 
 /// <summary>
@@ -34,10 +30,17 @@ MapData::MapData()
 bool MapData::Setup(std::string file)
 {
 	bool success = true;
+
 	int x = 0;
 	int y = 0;
 	int tx = 0;
 	int ty = 0;
+
+	int height;
+	int width;
+	int tileType;
+
+	strcpy(m_filename, file.c_str());
 
 	std::ifstream mapFile (file.c_str());
 
@@ -45,49 +48,77 @@ bool MapData::Setup(std::string file)
 	{
 		printf("unable to load map file\n");
 		success = false;
+		game.End();
 	}
 
-	m_tilesheet.LoadTileSheet("image/tile.png", game.GameRender());
-
-	for (y = 0; y < 16; y++)
+	mapFile >> width;
+	if (mapFile.fail())
 	{
-		for (x = 0; x < 12 ; x++)
+		printf( "Error loading map: Cannot find map width.\n" );
+		success = false;
+		game.End();
+	}
+	m_width = width;
+
+	mapFile >> height;
+	if (mapFile.fail())
+	{
+		printf( "Error loading map: Cannot find map height.\n" );
+		success = false;
+		game.End();
+	}
+	m_height = height;
+
+	m_tilesheet.LoadTileSheet("image/tile.png", game.GameRender());
+	for (y = 0; y < MAX_MAP_HEIGHT; y++)
+		for (x = 0; x < MAX_MAP_WIDTH ; x++)
+			m_tileSet[x][y] = new TileData(-1); //empty tile with empty list
+
+	for (y = 0; y < m_height; y++)
+	{
+		for (x = 0; x < m_width ; x++)
 		{
-			int tileType = -1;
+			
 
 			mapFile >> tileType;
 
 			if (mapFile.fail())
 			{
-			   printf( "Error loading map: Unexpected end of file!\n" );
+			   printf( "Error loading map: Incorrect Format\n" );
 			   success = false;
 			   break;
 			}
 
-			/*if ((tileType >= 0) && (tileType < TOTAL_TILE_SPRITES))
+			if ((tileType >= -1) && (tileType < TOTAL_TILE_SPRITES))
 			{
-				tilesheet.tileset[i] = new TileData(x, y, tileType);
-			}*/
-			if ((tileType >= 0) && (tileType < TOTAL_TILE_SPRITES))
-			{
-				m_tileSet[x][y] = new TileData(tileType);
+				m_tileSet[x][y]->SetType(tileType);
 			}
 			else
 			{
-				printf( "Error loading map: Invalid tile type found" );
+				printf( "Error loading map: Invalid tile type found.\n" );
 				success = false;
 				break;
 			}
 		}
-
-		/*
-		x += TILE_WIDTH;
-
-		if (x >= LEVEL_WIDTH)
+	}
+	
+	for (x = 0; x < m_width ; x++)
+	{
+		for (y = 0; y < m_height; y++)
 		{
-			x = 0;
-			y += TILE_HEIGHT;
-		}*/
+			short elevation = 0;
+
+			mapFile >> elevation;
+			
+			if (mapFile.fail())
+			{
+			   printf( "Error loading height information: Unexpected end of file!\n" );
+			   success = false;
+			   break;
+			}
+
+			m_tileSet[x][y]->SetHeight(elevation);
+		}
 	}
 	
 	mapFile.close();
@@ -103,43 +134,220 @@ bool MapData::Setup(std::string file)
 void MapData::Render(SDL_Renderer * renderer, int x, int y)
 {
 	SDL_Rect r;
+	SDL_Rect entRect;
+	m_x = x;
+	m_y = y;
+
 	r.w = TILE_WIDTH;
 	r.h = TILE_HEIGHT;
-	r.x = x;
-	r.y = y;
+	r.x = x + game.Camera().x;
+	r.y = y + game.Camera().y; // tile y
+
+	float heightChange = 0;
+
 	int rx;
-	for (int y = 0; y < 15; y++) //test
+
+	for (int sy = 0; sy < m_width + m_height; sy++)
 	{
-		//new
-		//r.y += 16;
+		int ty = sy;
+		int tx;
 
-		int ty = y;
-		rx = r.x;
-		for (int tx = 0; ty >= 0; tx++)
-		{
-			if (tx > 11) // glitch fix, tries to go in 12th part of tileset when there is none, access mem. violation. // y+= 16, x-= 31
-				break;
+		rx = r.x; // saves where we are on the tileset x
 
-			//new
-			//r.x -= 31;
+		for (tx = 0; ty >= 0; tx++)
+		{			
+			if(tx < m_width && ty < m_height
+			&& m_tileSet[tx][ty]->GetType() != -1)
+			{
+				heightChange = 0;
+				if (m_tileSet[tx][ty]->GetHeight() > 0)
+				{
+					for(int h = 0; h < m_tileSet[tx][ty]->GetHeight() - 1; h++)
+					{
+						m_tilesheet.Render(renderer, 5, r); // places collar
+						r.y -= (TILE_HEIGHT +1)/2;
+						heightChange-= (TILE_HEIGHT +1)/2;
+					}
+					m_tilesheet.Render(renderer, 4, r);
+					r.y -= (TILE_HEIGHT +1)/2;
+					heightChange-= (TILE_HEIGHT +1)/2;
+				}else if (m_tileSet[tx][ty]->GetHeight() < 0)
+				{
+					m_tilesheet.Render(renderer, 6, r);
+					r.y += (TILE_HEIGHT +1)/2;
+					heightChange+= (TILE_HEIGHT +1)/2;
+					for(int h = -m_tileSet[tx][ty]->GetHeight() - 1; h > 0 ; h--)
+					{
+						m_tilesheet.Render(renderer, 7, r); // places collar
+						r.y += (TILE_HEIGHT +1)/2;
+						heightChange+= (TILE_HEIGHT +1)/2;
+					}
+				}
 
-			//r.x -= 31 + (tx*TILE_WIDTH);
-			//r.y += 16 + (ty*TILE_HEIGHT);
-
-			m_tilesheet.Render(renderer, m_tileSet[tx][ty]->tilenum, r);
-			r.x += 64;
-
-			ty--;
+				m_tilesheet.Render(renderer, m_tileSet[tx][ty]->GetType(), r); // places tile
+				//SDL_RenderPresent(game.GameRender());
+				r.y -= heightChange;
+			}
+			ty--; // moves to next spot "y" on tileset
+			r.x += 64; // moves tilesheet clipper to the right
 		}
-		r.x = rx - 32;
-		r.y += 16;
-
+		 ty = sy;
+		 r.x = rx;
+		for (tx = 0; ty >= 0; tx++)
+		{			
+			if(tx < m_width && ty < m_height
+				&& m_tileSet[tx][ty]->GetType() != -1)
+			{
+				heightChange = 0;
+				if (m_tileSet[tx][ty]->GetHeight() > 0)
+				{
+					for(int h = 0; h < m_tileSet[tx][ty]->GetHeight() - 1; h++)
+					{
+						r.y -= (TILE_HEIGHT +1)/2;
+						heightChange-= (TILE_HEIGHT +1)/2;
+					}	
+					r.y -= (TILE_HEIGHT +1)/2;
+					heightChange-= (TILE_HEIGHT +1)/2;
+				}else if (m_tileSet[tx][ty]->GetHeight() < 0)
+				{
 		
+					r.y += (TILE_HEIGHT +1)/2;
+					heightChange+= (TILE_HEIGHT +1)/2;
+					for(int h = -m_tileSet[tx][ty]->GetHeight() - 1; h > 0 ; h--)
+					{			
+						r.y += (TILE_HEIGHT +1)/2;
+						heightChange+= (TILE_HEIGHT +1)/2;
+					}
+				}
+				for(EntityData *e = m_tileSet[tx][ty]->OnTile(); e != NULL; e = e->next)
+				{
+					entRect.y = r.y - TILE_HEIGHT / 2; //center of tile
+					entRect.x = r.x + TILE_WIDTH / 4; //center of tile
+
+					// if i am outside the boundaries of my own tile
+					// either find the center of the new tile and
+					// attach myself to that tile or simply use add 
+					// to tile func
+
+					entRect.w = TEXTURE_WIDTH;
+					entRect.h = TEXTURE_HEIGHT;
+					e->Render(renderer,entRect);
+				}
+				r.y -= heightChange;
+			}
+			ty--; // moves to next spot "y" on tileset
+			r.x += 64; // moves tilesheet clipper to the right
+		}
+
+		// now start clipping from a new x
+		r.x = rx - 32;
+		// moves tilesheet clipper down 16
+		r.y += 16;
 	}
+}
+
+bool MapData::Save()
+{
+	bool status = true;
+	FILE * mapFile;
+
+	//take edited data from array and save to file
+	if (m_filename != NULL)
+	{
+		//std::ofstream mapFile(m_filename);
+		mapFile = fopen(m_filename, "w");
+		if (mapFile == NULL)
+		{
+			printf("unable to load map file\n");
+			status = false;
+			game.End();
+		}
+
+		//mapFile << m_width + " ";
+		//mapFile << m_height + "\n";
+
+		fprintf(mapFile, "%i %i\n", m_width, m_height);
+
+		for (int y = 0; y < m_height; y++)
+		{
+			fprintf(mapFile, "\n");
+
+			for (int x = 0; x < m_width ; x++)
+			{
+				//mapFile << m_tileSet[x][y]->m_tileType + " ";
+				fprintf(mapFile, "%i ",  m_tileSet[x][y]->GetType());
+			}
+		}
+
+		//mapFile << "\n \n";
+		fprintf(mapFile, "\n \n");
+
+		for (int x = 0; x < m_width ; x++)
+		{
+			fprintf(mapFile, "\n");
+
+			for (int y = 0; y < m_height; y++)
+			{
+				//mapFile << m_tileSet[x][y]->m_elevation + " ";
+				fprintf(mapFile, "%i ", m_tileSet[x][y]->GetHeight());
+			}
+		}
+		
+		//mapFile.close();
+		fclose(mapFile);
+	}
+	else
+		status = false;
+
+	return status;
 }
 
 bool MapData::Close()
 {
 	// will close the map
 	return true;
+}
+
+void MapData::SetType(int tx, int ty, int tileType)
+{
+	m_tileSet[tx][ty]->SetType(tileType);
+}
+
+int MapData::GetHeight(int tx, int ty)
+{
+	return m_tileSet[tx][ty]->GetHeight();
+}
+
+bool MapData::AddEntityToTile(int tx, int ty, EntityData * ent)
+{
+	if(tx < 0 
+	|| ty < 0 
+	|| tx >= m_width
+	|| ty >= m_height) //TODO : THIS SHOULD BE AN ERROR
+		return false;
+	m_tileSet[tx][ty]->AddToList(ent);
+
+	//ent->SetParent(m_tileSet[tx][ty]);
+
+	return true;
+}
+
+bool MapData::RemoveEntityFromTile(int tx, int ty, EntityData * ent)
+{
+	if(tx < 0 
+	|| ty < 0 
+	|| tx >= m_width
+	|| ty >= m_height) //TODO : THIS SHOULD BE AN ERROR
+		return false;
+
+	m_tileSet[tx][ty]->RemoveFromList(ent);
+
+	//ent->ClearParent();
+
+	return true;
+}
+
+void MapData::PrintOnTile(int tx, int ty)
+{
+	m_tileSet[tx][ty]->PrintLinkList();
 }

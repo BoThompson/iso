@@ -12,6 +12,9 @@
 #define IS_BSET(a, b) (a & (1<<b))
 
 SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer );
+SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b );
 SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, SDL_Renderer * renderer );
+
+double trunc (double d);
 
 #endif _UTILS_H_

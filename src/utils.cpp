@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "game.h"
 #include "texture.h"
+#include <cmath>
 
 /// <summary>
 /// Loads the texture.
@@ -66,6 +67,31 @@ SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, 
 	return finalTexture;
 }
 
+SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b )
+{
+	SDL_Texture * finalTexture = NULL;
+
+	SDL_Surface * loadedSurface = IMG_Load(path.c_str() );
+
+	if (loadedSurface == NULL)
+	{
+		printf("load image fail: %s\n", IMG_GetError() );
+	}
+	else
+	{
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, r, g, b));
+		finalTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+		if (finalTexture == NULL)
+		{
+			printf("cannot render texture", SDL_GetError());
+		}
+
+		SDL_FreeSurface (loadedSurface);
+	}
+
+	return finalTexture;
+}
+
 /// <summary>
 /// Setups the specified texture from raw texture data.
 /// </summary>
@@ -83,6 +109,20 @@ bool TextureData::Setup (SDL_Texture * texture)
 	return true;
 }
 
+/*
+bool TextureSheetData::Setup(SDL_Texture * texture)
+{
+	if (texture == NULL || m_texture != NULL)
+		return false;
+
+	SDL_QueryTexture(texture, NULL, NULL, &m_width, &m_height);
+
+	m_texture = texture;
+
+	return true;
+}
+*/
+
 /// <summary>
 /// Frees this instance from memory.
 /// </summary>
@@ -95,4 +135,9 @@ void TextureData::Free()
 		m_width = 0;
 		m_height = 0;
 	}
+}
+
+double trunc(double d)
+{
+	return (d>0) ? floor(d) : ceil(d);
 }

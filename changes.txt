@@ -1,0 +1,23 @@
+reorganized game systems (camera, map, etc)
+
+entity structure added with linked list support
+
+added include header file, will use optimization for better efficiency with including headers
+
+linked list example
+
+mapData redesigned, accepts tile and height/elevation maps
+
+added support for spritesheets (texture sheet data)
+
+tileData redesigned for linked list
+
+entity adds itself to a tiles linked list, tile responsible for rendering everything in its linked list...
+
+...so, now renders player as part of the map
+
+move player with w,a,s,d,q,e,z,c
+
+move camera with left, right, up, down
+
+mapData now accepts any map within max_Width and max_height

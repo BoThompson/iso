@@ -1,6 +1,8 @@
 #ifndef _TEXTURE_H_
 #define _TEXTURE_H_
 
+#define TEXTURE_WIDTH 32
+#define TEXTURE_HEIGHT 32
 
 /// <summary>
 /// TextureData Class
@@ -26,7 +28,7 @@ class TextureData //texture.h/cpp
 	/// <summary>
 	/// The start time for the designated effect
 	/// </summary>
-	long m_texfxStart[2]; //error
+	long m_texfxStart[2]; // error
 	/// <summary>
 	/// The end time for designated effect
 	/// </summary>
@@ -36,8 +38,8 @@ public:
 	TextureData();
 	//~TextureData();
 
-	bool Setup (SDL_Texture * texture);
-	void Free();
+	bool Setup (SDL_Texture * texture); // in utils.cpp
+	void Free(); // in utils.cpp
 	void SetColor(Uint8 red, Uint8 green, Uint8 blue);
 	void SetBlendMode(SDL_BlendMode blending);
 	void SetAlpha(Uint8 alpha);
@@ -51,4 +53,15 @@ public:
 	int SetHeight(int height);
 };
 
+class TextureSheetData
+{
+	int m_line; // frames per line
+	TextureData m_texture; //spritesheet
+
+public:
+	//TextureSheetData();
+	void LoadSheet(std::string path, SDL_Renderer * renderer, Uint8 r = NULL, Uint8 g = NULL, Uint8 b = NULL);
+	//void SetColorKey(
+	void Render (SDL_Renderer * renderer, int num, SDL_Rect dest);
+};
 #endif

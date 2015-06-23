@@ -1,7 +1,7 @@
 #ifndef _GAME_H_
 #define _GAME_H_
 
-#include <SDL_ttf.h>
+#include <SDL_ttf.h> // Error 2	error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
 
 /// <summary>
 /// List of possible Texture Effects
@@ -29,11 +29,19 @@ class GameData //game.h/cpp
 	/// <summary>
 	/// Splash screen texture
 	/// </summary>
-	SDL_Texture * m_texture;	
+	SDL_Texture * m_texture;
+	/// <summary>
+	/// The game's camera
+	/// </summary>
+	SDL_Rect m_camera;
 	/// <summary>
 	/// SDL polled events
 	/// </summary>
 	SDL_Event m_events;	
+	/// <summary>
+	/// The game's current map
+	/// </summary>
+	struct MapData * m_currentMap; // cirucular dependency, using struct instead
 	/// <summary>
 	/// If the game is done
 	/// </summary>
@@ -51,8 +59,14 @@ class GameData //game.h/cpp
 
 public: 
 	bool Run();
+	
 	SDL_Renderer * GameRender();
 	SDL_Texture * LoadImage(std::string path);
+	SDL_Rect Camera();
+	MapData * CurrentMap();
+	
+	void SetCamera(int x, int y);
+	void End();
 };
 
 #endif //_GAME_H_

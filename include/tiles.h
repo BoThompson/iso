@@ -16,10 +16,15 @@ class TileData //tiles.h/cpp
 	/// The type of the tile
 	/// </summary>
 	int m_tileType;
-	/// <summary>
-	/// The center
-	/// </summary>
-	int center;
+
+	int centerX;
+	int centerY;
+
+	int leftBound; //centerX - 32
+	int rightBound; // centerX + 32
+	int topBound; // centerY - 16
+	int bottomBound; // centerY + 16
+
 	/// <summary>
 	/// Designated list of things that is on this tile
 	/// </summary>

@@ -6,12 +6,20 @@ class EntityData //EntityData
 {
 	int		m_tx; // keep track of tiles x and y
 	int		m_ty;
-	int		distanceFromCenterX; // if -32, switch sign and tile
-	int		distanceFromCenterY; // if +32, switch sign and tile
 	float	m_height;
 	float	m_width;
 	TextureSheetData m_spritesheet;
 	struct TileData	* m_parentTile; // circular dependency, using struct instead
+
+	/* The following values will come from the current tile we are on */
+	int currentcenterX;
+	int currentcenterY;
+
+	int currentleftBound;
+	int currentrightBound;
+	int currenttopBound;
+	int currentbottomBound;
+
 public:
 	int		m_x;
 	int		m_y;

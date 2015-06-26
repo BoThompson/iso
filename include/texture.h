@@ -43,7 +43,7 @@ public:
 	void SetColor(Uint8 red, Uint8 green, Uint8 blue);
 	void SetBlendMode(SDL_BlendMode blending);
 	void SetAlpha(Uint8 alpha);
-	void Render (SDL_Renderer * renderer, SDL_Rect * src, SDL_Rect * dest);
+	void Render (SDL_Renderer * renderer, SDL_Rect * src, SDL_Rect * dest, SDL_RendererFlip flipType);
 	void NRender (int x, int y, SDL_Renderer * renderer, SDL_Rect * clip = NULL, double angle = 0.0, SDL_Point * center = NULL, SDL_RendererFlip flip = SDL_FLIP_NONE );
 	void SetEffect(int flag, long start, long final);
 	void UpdateEffects();
@@ -62,6 +62,6 @@ public:
 	//TextureSheetData();
 	void LoadSheet(std::string path, SDL_Renderer * renderer, Uint8 r = NULL, Uint8 g = NULL, Uint8 b = NULL);
 	//void SetColorKey(
-	void Render (SDL_Renderer * renderer, int num, SDL_Rect dest);
+	void Render (SDL_Renderer * renderer, int num, SDL_Rect dest, SDL_RendererFlip flipType);
 };
 #endif

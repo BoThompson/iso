@@ -16,21 +16,22 @@ class TileData //tiles.h/cpp
 	/// The type of the tile
 	/// </summary>
 	int m_tileType;
-
-	int centerX;
-	int centerY;
-
-	int leftBound; //centerX - 32
-	int rightBound; // centerX + 32
-	int topBound; // centerY - 16
-	int bottomBound; // centerY + 16
-
 	/// <summary>
 	/// Designated list of things that is on this tile
 	/// </summary>
 	EntityData * current; // current entity being pointed at
 	EntityData * m_onTile; // beginning of list, there may be more than one item on top of this tile
 	EntityData * temp; // temp pointer for functional purposes
+
+	/* The following are values for each tile's center and boundaries */
+	int centerX; // defined by equation
+	int centerY;
+
+	int leftBound; //centerX - 32
+	int rightBound; // centerX + 32
+	int topBound; // centerY - 16?
+	int bottomBound; // centerY + 16?
+
 public:
 	TileData(int tileType); // function to init. a tile
 	
@@ -44,6 +45,14 @@ public:
 	EntityData *RemoveFromList(EntityData * ent);
 	void PrintLinkList();
 	EntityData *OnTile();
+	void SetBoundaries(int centerX, int centerY);
+	
+	int CenterX();
+	int CenterY();
+	int RightBound();
+	int TopBound();
+	int LeftBound();
+	int BottomBound();
 };
 
 /// <summary>

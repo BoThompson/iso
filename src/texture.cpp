@@ -56,9 +56,10 @@ void TextureData::SetAlpha(Uint8 alpha)
 /// <param name="renderer">The renderer specified.</param>
 /// <param name="src">The source rectangle or what has been clipped. ex. frame of spritesheet.</param>
 /// <param name="dest">The dest rectangle or where it will show up on screen.</param>
-void TextureData::Render (SDL_Renderer * renderer, SDL_Rect *src, SDL_Rect *dest)
+void TextureData::Render (SDL_Renderer * renderer, SDL_Rect *src, SDL_Rect *dest, SDL_RendererFlip flipType)
 {
-	SDL_RenderCopy(renderer, m_texture, src, dest);
+	//SDL_RenderCopy(renderer, m_texture, src, dest);
+	SDL_RenderCopyEx(renderer, m_texture, src, dest, NULL, NULL, flipType);
 }
 
 /// <summary>
@@ -192,7 +193,7 @@ void TextureSheetData::LoadSheet(std::string path, SDL_Renderer * renderer, Uint
 	m_texture.Setup(LoadTexture(path, renderer, r, g, b));
 }
 
-void TextureSheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest)
+void TextureSheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest, SDL_RendererFlip flipType)
 {
 	SDL_Rect source;
 
@@ -201,5 +202,5 @@ void TextureSheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest)
 	source.w = TEXTURE_WIDTH;
 	source.h = TEXTURE_HEIGHT;
 
-	m_texture.Render(renderer, &source, &dest);
+	m_texture.Render(renderer, &source, &dest, flipType);
 }

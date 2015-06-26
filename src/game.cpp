@@ -281,29 +281,48 @@ void GameData::Poll()
 							game.SetCamera(0, -32);
 							break;
 						case SDLK_w:
-							player.Move(0,-1);
-							//player.m_y += 1;
+							//player.Move(0,-1);
+							player.SetFrame(1, true);
+							player.m_x += 1;
+							player.m_y -= 1;
 							break;
 						case SDLK_a:
-							player.Move(-1, 0);
+							//player.Move(-1, 0);
+							player.SetFrame(1, false);
+							player.m_x -= 1;
+							player.m_y -= 1;
 							break;
 						case SDLK_s:
-							 player.Move(0,1);
+							//player.Move(0,1);
+							player.SetFrame(0, false);
+							player.m_x -= 1;
+							player.m_y += 1;
 							break;
 						case SDLK_d:
-							player.Move(1, 0);
+							//player.Move(1, 0);
+							player.SetFrame(0, true);
+							player.m_x += 1;
+							player.m_y += 1;
 							break;
 						case SDLK_q:
-							player.Move(-1,-1);
+							//player.Move(-1,-1);
+							player.SetFrame(1, true);
+							player.m_y -= 1;
 							break;
 						case SDLK_e:
-							player.Move(1, -1);
+							//player.Move(1, -1);
+							player.SetFrame(0, true);
+							player.m_x += 1;
 							break;
 						case SDLK_z:
-							 player.Move(-1,1);
+							//player.Move(-1,1);
+							player.SetFrame(0, false);
+							player.m_x -= 1;
 							break;
 						case SDLK_c:
-							player.Move(1, 1);
+							//player.Move(1, 1);
+							player.SetFrame(0, true);
+							player.m_y += 1;
 							break;
 					}
 				}
@@ -361,11 +380,11 @@ void GameData::Draw()
 	r.h = 50;
 
 	//texture1.Render (m_renderer, NULL, &camera);
-	textureText.Render(m_renderer, NULL, &r);
+	textureText.Render(m_renderer, NULL, &r, SDL_FLIP_NONE);
 	game.CurrentMap()->Render(m_renderer, 600, 0);
-	texturePixel.Render(m_renderer, NULL, &w);
+	texturePixel.Render(m_renderer, NULL, &w, SDL_FLIP_NONE);
 
-	player.Render(m_renderer,NULL,player.m_x,player.m_y);
+	//player.Render(m_renderer,NULL,player.m_x,player.m_y);
 	
 	// color modulation
 	/*textureColors.SetColor(r, g, b);
@@ -379,7 +398,7 @@ void GameData::Draw()
 
 	if (nextscreen)
 	{
-		texture2.Render(m_renderer, NULL, NULL);
+		texture2.Render(m_renderer, NULL, NULL, SDL_FLIP_NONE);
 	}
 	
 	//SDL_RenderCopy(m_renderer, m_texture, NULL, NULL);

@@ -2,14 +2,17 @@
 #ifndef _PLAYER_H_
 #define _PLAYER_H_
 
-class EntityData //EntityData
+class EntityData //entity.h/cpp
 {
-	int		m_tx; // keep track of tiles x and y
-	int		m_ty;
+	int		m_tx;
+	int		m_ty; // tileset x and y
 	float	m_height;
 	float	m_width;
 	TextureSheetData m_spritesheet;
-	struct TileData	* m_parentTile; // circular dependency, using struct instead
+	int		frame;
+	SDL_RendererFlip	flipType;
+	bool	m_isAlreadyFlipped;
+	struct TileData	* m_parentTile; // avoid circular dependency
 
 	/* The following values will come from the current tile we are on */
 	int currentcenterX;
@@ -28,8 +31,8 @@ public:
 	
 	void Setup();
 	void SetName(const char * name);
-	void Render(SDL_Renderer * renderer, int num, int x, int y);
-	void Render(SDL_Renderer * renderer, SDL_Rect r);
+	//void Render(SDL_Renderer * renderer, int num, int x, int y);
+	void Render(SDL_Renderer * renderer, int num, SDL_Rect r);
 	
 	void Move(int x, int y);
 	
@@ -37,6 +40,8 @@ public:
 	void SetParent (TileData * tile);
 	void RemoveFromTile();
 	void ClearParent();
+
+	void SetFrame(int frame, bool flip);
 	
 	EntityData *next; // take player out of old list, put in new list
 	char m_name[25];

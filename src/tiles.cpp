@@ -107,6 +107,47 @@ EntityData * TileData::OnTile()
 {
 	return m_onTile;
 }
+
+void TileData::SetBoundaries(int centerX, int centerY)
+{
+	this->centerX = centerX;
+	this->centerY = centerY;
+
+	this->leftBound = this->centerX - 32;
+	this->rightBound = this->centerX + 32;
+	this->topBound = this->centerY - 16;
+	this->bottomBound = this->centerY + 16;
+}
+
+int TileData::CenterX()
+{
+	return this->centerX;
+}
+int TileData::CenterY()
+{
+	return this->centerY;
+}
+
+int TileData::LeftBound()
+{
+	return this->leftBound;
+}
+
+int TileData::TopBound()
+{
+	return this->topBound;
+}
+
+int TileData::BottomBound()
+{
+	return this->bottomBound;
+}
+
+int TileData::RightBound()
+{
+	return this->rightBound;
+}
+
 /// <summary>
 /// Initializes a new instance of the <see cref="TilesheetData"/> class.
 /// </summary>
@@ -133,7 +174,7 @@ void TilesheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest)
 	source.w = TILE_WIDTH;
 	source.h = TILE_HEIGHT;
 
-	m_textureTile.Render(renderer, &source, &dest);
+	m_textureTile.Render(renderer, &source, &dest, SDL_FLIP_NONE);
 }
 
 /// <summary>

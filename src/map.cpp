@@ -219,20 +219,21 @@ void MapData::Render(SDL_Renderer * renderer, int x, int y)
 						heightChange+= (TILE_HEIGHT +1)/2;
 					}
 				}
+
+				int centerX = r.x + TILE_WIDTH / 4;
+				int centerY = r.y - TILE_HEIGHT / 2;
+
+				m_tileSet[tx][ty]->SetBoundaries(centerX, centerY);
+
 				for(EntityData *e = m_tileSet[tx][ty]->OnTile(); e != NULL; e = e->next)
 				{
-					entRect.y = r.y - TILE_HEIGHT / 2; //center of tile
-					entRect.x = r.x + TILE_WIDTH / 4; //center of tile
-
-					// if i am outside the boundaries of my own tile
-					// either find the center of the new tile and
-					// attach myself to that tile or simply use add 
-					// to tile func
-
+					entRect.y = (r.y - TILE_HEIGHT / 2) + e->m_y; // center of tile
+					entRect.x = (r.x + TILE_WIDTH / 4) + e->m_x;// center of tile
 					entRect.w = TEXTURE_WIDTH;
 					entRect.h = TEXTURE_HEIGHT;
-					e->Render(renderer,entRect);
+					e->Render(renderer, NULL, entRect);
 				}
+
 				r.y -= heightChange;
 			}
 			ty--; // moves to next spot "y" on tileset
@@ -327,7 +328,7 @@ bool MapData::AddEntityToTile(int tx, int ty, EntityData * ent)
 		return false;
 	m_tileSet[tx][ty]->AddToList(ent);
 
-	//ent->SetParent(m_tileSet[tx][ty]);
+	ent->SetParent(m_tileSet[tx][ty]);
 
 	return true;
 }
@@ -342,7 +343,7 @@ bool MapData::RemoveEntityFromTile(int tx, int ty, EntityData * ent)
 
 	m_tileSet[tx][ty]->RemoveFromList(ent);
 
-	//ent->ClearParent();
+	ent->ClearParent();
 
 	return true;
 }

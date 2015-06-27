@@ -10,6 +10,7 @@ EntityData::EntityData()
 void EntityData::Setup()
 {
 	m_spritesheet.LoadSheet("image/sheet.png", game.GameRender(), 0, 128, 192);
+	this->m_animator = new AnimatorData("anim/player.anim");
 }
 
 void EntityData::SetName(const char * name)
@@ -36,7 +37,8 @@ void EntityData::Render(SDL_Renderer * renderer, int num, int x, int y)
 */
 void EntityData::Render(SDL_Renderer * renderer, int num, SDL_Rect r)
 {
-	m_spritesheet.Render(renderer, this->frame, r, this->flipType);
+	//m_spritesheet.Render(renderer, this->frame, r, this->flipType);
+	this->m_animator->Animate(m_spritesheet, &m_animator->m_animations[0], r, this->flipType);
 
 	if (m_parentTile != NULL && m_parentTile->OnTile() != NULL)
 	{
@@ -55,7 +57,7 @@ void EntityData::Render(SDL_Renderer * renderer, int num, SDL_Rect r)
 		{
 			printf("outside on top right, tile change +0, +1");
 			Move(0,-1);
-			m_x = 0;
+			m_x = m_x - 32;
 			m_y = 0;
 		}
 		else if (r.x - 10 < currentleftBound) // if closer to left bound
@@ -80,22 +82,22 @@ void EntityData::Render(SDL_Renderer * renderer, int num, SDL_Rect r)
 		{
 			printf("outside on bottom right, tile change +0, +1");
 			Move(1,0);
-			m_x = 0;
-			m_y = 0;
+			m_x = 32 - m_x;
+			m_y = -1;
 		}
 		else if (r.x - 10 < currentleftBound) // if closer to left bound
 		{
 			printf("outside on bottom left, tile change +1, +0");
 			Move(0, 1); // shouldn't this be 1, 0?
 			m_x = 0;
-			m_y = 0;
+			m_y = 1;
 		}
 		else if (r.y - 10 > currentbottomBound)
 		{
 			printf("move directly down, tile change +1, +0");
 			Move(1, 1);
 			m_x = 0;
-			m_y = 0;
+			m_y = 1;
 		}
 	}
 }

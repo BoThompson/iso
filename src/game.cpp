@@ -17,6 +17,9 @@ TextureData textureColorkey;
 TextureData textureTiles;
 TextureData textureColors;
 TextureData texturePixel;
+TextureData textureProfile;
+TextureData textureLarvesta;
+TextureData textureHealth;
 
 //MapData map;
 SDL_Rect w;
@@ -174,6 +177,18 @@ bool GameData::Setup()
 						{
 							success = false;
 						}
+						if(!textureProfile.Setup(LoadTexture("image/charprofile.png", m_renderer)))
+						{
+							success = false;
+						}
+						if (!textureLarvesta.Setup(LoadTexture("image/Larvesta.png", m_renderer)))
+						{
+							success = false;
+						}
+						if(!textureHealth.Setup(LoadTexture("image/health.png", m_renderer)))
+						{
+							success = false;
+						}
 						player.Setup();
 						player.AddToTile(0, 0);
 						player.SetName("player");
@@ -283,25 +298,25 @@ void GameData::Poll()
 						case SDLK_w:
 							//player.Move(0,-1);
 							player.SetFrame(1, true);
-							player.m_x += 1;
+							player.m_x += 2;
 							player.m_y -= 1;
 							break;
 						case SDLK_a:
 							//player.Move(-1, 0);
 							player.SetFrame(1, false);
-							player.m_x -= 1;
+							player.m_x -= 2;
 							player.m_y -= 1;
 							break;
 						case SDLK_s:
 							//player.Move(0,1);
 							player.SetFrame(0, false);
-							player.m_x -= 1;
+							player.m_x -= 2;
 							player.m_y += 1;
 							break;
 						case SDLK_d:
 							//player.Move(1, 0);
 							player.SetFrame(0, true);
-							player.m_x += 1;
+							player.m_x += 2;
 							player.m_y += 1;
 							break;
 						case SDLK_q:
@@ -312,12 +327,12 @@ void GameData::Poll()
 						case SDLK_e:
 							//player.Move(1, -1);
 							player.SetFrame(0, true);
-							player.m_x += 1;
+							player.m_x += 2;
 							break;
 						case SDLK_z:
 							//player.Move(-1,1);
 							player.SetFrame(0, false);
-							player.m_x -= 1;
+							player.m_x -= 2;
 							break;
 						case SDLK_c:
 							//player.Move(1, 1);
@@ -336,6 +351,8 @@ void GameData::Poll()
 /// </summary>
 void GameData::Update ()
 {
+	m_Time = SDL_GetTicks();
+
 	current = SDL_GetTicks();
 	
 	texture1.UpdateEffects();
@@ -379,10 +396,40 @@ void GameData::Draw()
 	r.w = 450;
 	r.h = 50;
 
+	SDL_Rect z;
+	z.x = 640;
+	z.y = 380;
+	z.w = 93;
+	z.h = 93;
+
+	SDL_Rect health;
+	health.x = 0;
+	health.y = 0;
+	health.w = 120;
+	health.h = 25;
+
 	//texture1.Render (m_renderer, NULL, &camera);
-	textureText.Render(m_renderer, NULL, &r, SDL_FLIP_NONE);
+	//textureText.Render(m_renderer, NULL, &r, SDL_FLIP_NONE);
 	game.CurrentMap()->Render(m_renderer, 600, 0);
-	texturePixel.Render(m_renderer, NULL, &w, SDL_FLIP_NONE);
+	//texturePixel.Render(m_renderer, NULL, &w, SDL_FLIP_NONE);
+	/*textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);*/
+	SDL_Texture *profileTex = SDL_CreateTexture(m_renderer, textureProfile.GetFormat(), 
+		SDL_TEXTUREACCESS_TARGET, textureProfile.Width(), textureProfile.Height());
+	SDL_SetRenderTarget(m_renderer, profileTex);
+	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
+	SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
+	SDL_RenderFillRect(m_renderer, NULL);
+	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+	//textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+	SDL_RenderCopy(m_renderer, textureProfile.Texture(), NULL, &z);
+	SDL_SetRenderTarget(m_renderer, NULL);
+	SDL_RenderCopy(m_renderer, profileTex, NULL, &z);
+	//SDL_RendererInfo info;
+	//SDL_GetRendererInfo(m_renderer, &info);
+	//textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+	//SDL_SetTextureBlendMode(profileTex, SDL_BLENDMODE_MOD);
+	//textureLarvesta.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+	textureHealth.Render(m_renderer, NULL, &health, SDL_FLIP_NONE);
 
 	//player.Render(m_renderer,NULL,player.m_x,player.m_y);
 	
@@ -524,6 +571,11 @@ bool GameData::Run()
 	}while(!m_done);
 
 	Shutdown();
+}
+
+Uint32 GameData::CurrentTime()
+{
+	return m_Time;
 }
 
 SDL_Rect GameData::Camera()

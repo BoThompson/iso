@@ -67,7 +67,7 @@ SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, 
 	return finalTexture;
 }
 
-SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b )
+SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b, bool srccolorkey )
 {
 	SDL_Texture * finalTexture = NULL;
 
@@ -81,6 +81,7 @@ SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, 
 	{
 		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, r, g, b));
 		finalTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	
 		if (finalTexture == NULL)
 		{
 			printf("cannot render texture", SDL_GetError());
@@ -91,6 +92,8 @@ SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, 
 
 	return finalTexture;
 }
+
+
 
 /// <summary>
 /// Setups the specified texture from raw texture data.

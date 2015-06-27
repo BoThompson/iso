@@ -13,6 +13,7 @@ class EntityData //entity.h/cpp
 	SDL_RendererFlip	flipType;
 	bool	m_isAlreadyFlipped;
 	struct TileData	* m_parentTile; // avoid circular dependency
+	AnimatorData * m_animator;
 
 	/* The following values will come from the current tile we are on */
 	int currentcenterX;

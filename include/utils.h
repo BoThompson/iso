@@ -14,6 +14,7 @@
 SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer );
 SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b );
 SDL_Texture * LoadTexture (std ::string text, TTF_Font * font, SDL_Color color, SDL_Renderer * renderer );
+SDL_Texture * LoadTexture (std ::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b, bool srccolorkey = false );
 
 double trunc (double d);
 

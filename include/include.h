@@ -11,6 +11,7 @@
 #include <fstream>
 #include "utils.h"
 #include "texture.h"
+#include "animation.h"
 #include "entity.h"
 #include "tiles.h"
 #include "map.h"

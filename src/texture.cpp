@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include <string>
-#include <stdlib.h>
-#include <SDL.h>
-#include <SDL_image.h>
-#include "utils.h"
-#include "game.h"
-#include "texture.h"
+#include "include.h"
 
 extern enum Effects; // extern is ignored
 extern bool nextscreen;
@@ -49,6 +42,14 @@ void TextureData::SetAlpha(Uint8 alpha)
 	SDL_SetTextureAlphaMod(m_texture, alpha);
 }
 
+Uint32 TextureData::GetFormat()
+{
+	Uint32 format;
+
+	SDL_QueryTexture(m_texture, &format, NULL, NULL, NULL);
+
+	return format;
+}
 
 /// <summary>
 /// Renders the texture to the specified render.
@@ -187,18 +188,28 @@ int TextureData::SetHeight(int height)
 	return height;
 }
 
+SDL_Texture * TextureData::Texture()
+{
+	return m_texture;
+}
+
+SDL_Texture * TextureSheetData::Texture()
+{
+	return m_texture.Texture();
+}
+
 void TextureSheetData::LoadSheet(std::string path, SDL_Renderer * renderer, Uint8 r, Uint8 g, Uint8 b)
 {
 	m_texture = TextureData();
-	m_texture.Setup(LoadTexture(path, renderer, r, g, b));
+	m_texture.Setup(LoadTexture(path, renderer, r, g, b, NULL));
 }
 
 void TextureSheetData::Render(SDL_Renderer * renderer, int num, SDL_Rect dest, SDL_RendererFlip flipType)
 {
 	SDL_Rect source;
 
-	source.x = (num * TEXTURE_WIDTH) % 32;
-	source.y = (num * TEXTURE_WIDTH) / 32 * TEXTURE_HEIGHT;
+	source.x = num % 4 * 32;
+	source.y = num / 4 * TEXTURE_HEIGHT;
 	source.w = TEXTURE_WIDTH;
 	source.h = TEXTURE_HEIGHT;
 

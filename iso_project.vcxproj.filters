@@ -45,6 +45,9 @@
     <ClInclude Include="include\entity.h">
       <Filter>engine\header files</Filter>
     </ClInclude>
+    <ClInclude Include="include\animation.h">
+      <Filter>engine\header files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -73,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="include\include.h">
       <Filter>engine\header files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animation.cpp">
+      <Filter>engine\source files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -25,7 +25,11 @@ class GameData //game.h/cpp
 	/// <summary>
 	/// Window for the game
 	/// </summary>
-	SDL_Window * m_window;	
+	SDL_Window * m_window;
+	/// <summary>
+	/// The game time
+	/// </summary>
+	Uint32 m_Time;
 	/// <summary>
 	/// Splash screen texture
 	/// </summary>
@@ -59,6 +63,7 @@ class GameData //game.h/cpp
 
 public: 
 	bool Run();
+	Uint32 CurrentTime();
 	
 	SDL_Renderer * GameRender();
 	SDL_Texture * LoadImage(std::string path);

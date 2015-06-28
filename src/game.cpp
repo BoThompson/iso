@@ -408,47 +408,53 @@ void GameData::Draw()
 	health.w = 120;
 	health.h = 25;
 
+	game.CurrentMap()->Render(m_renderer, 600, 0);
+	
 	//texture1.Render (m_renderer, NULL, &camera);
 	//textureText.Render(m_renderer, NULL, &r, SDL_FLIP_NONE);
-	game.CurrentMap()->Render(m_renderer, 600, 0);
 	//texturePixel.Render(m_renderer, NULL, &w, SDL_FLIP_NONE);
-	/*textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);*/
+
+	
+	//textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+
 	SDL_Texture *profileTex = SDL_CreateTexture(m_renderer, textureProfile.GetFormat(), 
 		SDL_TEXTUREACCESS_TARGET, textureProfile.Width(), textureProfile.Height());
-	SDL_SetRenderTarget(m_renderer, profileTex);
-	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_NONE);
-	SDL_SetRenderDrawColor(m_renderer, 0, 0, 0, 255);
-	SDL_RenderFillRect(m_renderer, NULL);
-	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
-	//textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
-	SDL_RenderCopy(m_renderer, textureProfile.Texture(), NULL, &z);
+	SDL_SetTextureBlendMode(profileTex, SDL_BLENDMODE_BLEND);
+
+	//SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+	//SDL_RenderCopy(m_renderer, textureProfile.Texture(), NULL, &z);
 	SDL_SetRenderTarget(m_renderer, NULL);
-	SDL_RenderCopy(m_renderer, profileTex, NULL, &z);
+	SDL_SetRenderDrawBlendMode(m_renderer, SDL_BLENDMODE_BLEND);
+	SDL_SetRenderDrawColor(m_renderer, 0x00, 0x00, 0x00, 0xFF);
 	//SDL_RendererInfo info;
 	//SDL_GetRendererInfo(m_renderer, &info);
-	//textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
-	//SDL_SetTextureBlendMode(profileTex, SDL_BLENDMODE_MOD);
-	//textureLarvesta.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
-	textureHealth.Render(m_renderer, NULL, &health, SDL_FLIP_NONE);
+	SDL_SetRenderTarget(m_renderer, profileTex);
+	textureProfile.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+	textureLarvesta.Render(m_renderer, NULL, &z, SDL_FLIP_NONE);
+	SDL_RenderCopy(m_renderer, profileTex, NULL, &z);
+	SDL_RenderFillRect(m_renderer, &z);
+	SDL_RenderCopy(m_renderer, profileTex, NULL, &z);
+	SDL_SetRenderTarget(m_renderer, NULL);
+	
 
-	//player.Render(m_renderer,NULL,player.m_x,player.m_y);
+	/*
+	//textureHealth.Render(m_renderer, NULL, &health, SDL_FLIP_NONE);
 	
 	// color modulation
-	/*textureColors.SetColor(r, g, b);
-	textureColors.Render(20, 20, m_renderer);*/
+	textureColors.SetColor(r, g, b);
+	textureColors.Render(20, 20, m_renderer);
 
 	// rotation and flipping
-	/*textureArrow.NRender(100, 100, m_renderer, NULL, degrees, NULL, flipType);*/
+	textureArrow.NRender(100, 100, m_renderer, NULL, degrees, NULL, flipType);
 
 	// color key
-	/*textureColorkey.Render(100, 200, m_renderer);*/
+	textureColorkey.Render(100, 200, m_renderer);
+	*/
 
 	if (nextscreen)
 	{
 		texture2.Render(m_renderer, NULL, NULL, SDL_FLIP_NONE);
 	}
-	
-	//SDL_RenderCopy(m_renderer, m_texture, NULL, NULL);
 	
 	// viewports
 	/*
